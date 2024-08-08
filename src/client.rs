@@ -37,7 +37,7 @@ impl Client<Auth> {
         let url = format!("{}/api/health", self.base_url);
         match Httpc::get(self, &url, None) {
             Ok(response) => Ok(response.into_json::<HealthCheckResponse>()?),
-            Err(e) => Err(anyhow!("{}", e))
+            Err(e) => Err(anyhow!("{}", e)),
         }
     }
 
@@ -49,6 +49,17 @@ impl Client<Auth> {
         RecordsManager {
             client: self,
             name: record_name,
+        }
+    }
+    pub fn get_file_token(&self) -> Result<String> {
+        #[derive(Debug, Clone, Deserialize)]
+        struct TokenResponse {
+            token: String,
+        }
+        let url = format!("{}/api/files/token", self.base_url);
+        match Httpc::post(self, &url, String::from("")) {
+            Ok(response) => Ok(response.into_json::<TokenResponse>()?.token),
+            Err(e) => Err(anyhow!("{}", e)),
         }
     }
 }
@@ -66,11 +77,16 @@ impl Client<NoAuth> {
         let url = format!("{}/api/health", self.base_url);
         match Httpc::get(self, &url, None) {
             Ok(response) => Ok(response.into_json::<HealthCheckResponse>()?),
-            Err(e) => Err(anyhow!("{}", e))
+            Err(e) => Err(anyhow!("{}", e)),
         }
     }
 
-    pub fn auth_with_password(&self, collection: &str, identifier: &str, secret: &str) -> Result<Client<Auth>> {
+    pub fn auth_with_password(
+        &self,
+        collection: &str,
+        identifier: &str,
+        secret: &str,
+    ) -> Result<Client<Auth>> {
         let url = format!(
             "{}/api/collections/{}/auth-with-password",
             self.base_url, collection

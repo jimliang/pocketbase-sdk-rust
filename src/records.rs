@@ -1,4 +1,5 @@
 use crate::client::{Auth, Client};
+use crate::files::FileUrlRequestBulder;
 use crate::httpc::Httpc;
 use anyhow::{anyhow, Result};
 use serde::Serialize;
@@ -246,6 +247,17 @@ impl<'a> RecordsManager<'a> {
             sort: None,
             page: 1,
             per_page: 100,
+        }
+    }
+    pub fn get_file_url(&self, identifier: &'a str, file_name: &'a str) -> FileUrlRequestBulder<'a> {
+        FileUrlRequestBulder {
+            client: self.client,
+            collection_name: self.name,
+            identifier,
+            file_name,
+            thumb: None,
+            download: true,
+            token: None,
         }
     }
 }
